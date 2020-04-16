@@ -1,0 +1,13 @@
+class1 99
+class2 88
+class2 32
+class1 22
+class1 434
+class2 23
+class2 3
+class1 94
+class2 32
+class1 32
+class2 23
+class2 423
+class1 456
