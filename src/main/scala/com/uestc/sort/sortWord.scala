@@ -1,11 +1,11 @@
-package com.uestc.sortWord
+package com.uestc.sort
 
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
   *按单词出现的次数从多到少排序
   */
-object eg1 {
+object sortWord {
   def main(args: Array[String]): Unit = {
     func
   }
