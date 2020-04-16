@@ -6,7 +6,8 @@ object ActionOperation {
     //collect
     //count
     //take
-    saveAsTextFile
+    //saveAsTextFile
+    foreach
   }
   def reduce(): Unit = {
     val conf = new SparkConf().setMaster("local").setAppName("reduce")
@@ -47,5 +48,11 @@ object ActionOperation {
     val sc = new SparkContext(conf)
       .parallelize(Array(1,2,3,34),1)
     val arrs = sc.saveAsTextFile(path)
+  }
+  def foreach(): Unit ={
+    val conf = new SparkConf().setMaster("local").setAppName("reduce")
+    val sc = new SparkContext(conf)
+      .parallelize(Array(1,2,3,34),1)
+    val arrs = sc.foreach(x=>println(x))
   }
 }
