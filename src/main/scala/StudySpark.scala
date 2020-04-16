@@ -3,7 +3,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 object StudySpark {
   def main(args: Array[String]): Unit = {
     //groupByKey
-    reduceByKey
+    //reduceByKey
+    sortByKey
   }
   def groupByKey(): Unit = {
     val conf = new SparkConf().setMaster("local").setAppName("groupByKey")
@@ -23,5 +24,11 @@ object StudySpark {
       .reduceByKey{
       (x,y)=>x+y
     }.foreach(x=>println(x))
+  }
+  def sortByKey(): Unit = {
+    val conf = new SparkConf().setMaster("local").setAppName("reduceByKey")
+    val sc = new SparkContext(conf)
+    sc.parallelize(Array(Tuple2(1,33),Tuple2(22,2),Tuple2(111,44),Tuple2(4,55)))
+        .sortByKey(true).foreach(x=>println(x))
   }
 }
