@@ -1,12 +1,13 @@
 import org.apache.spark.{SparkConf, SparkContext}
 
-object StudySpark {
+object Transformation {
   def main(args: Array[String]): Unit = {
     //groupByKey
     //reduceByKey
     //sortByKey
-    join
+    //join
     //cogroup
+    flatMap
   }
   def groupByKey(): Unit = {
     val conf = new SparkConf().setMaster("local").setAppName("groupByKey")
@@ -110,6 +111,12 @@ name:CompactBuffer(80)
 //      println("name: " + msg._2._1)
 //      println("socre: " + msg._2._2)
 //    })
+  }
+  def flatMap(): Unit ={
+    val conf = new SparkConf().setMaster("local").setAppName("groupByKey")
+    val sc = new SparkContext(conf)
+    sc.parallelize(Array("11:22","22:33","33:44"),1)
+      .flatMap(x=>x.split(":")).foreach(x=>println(x))
   }
 
 }
