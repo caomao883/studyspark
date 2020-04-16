@@ -6,6 +6,7 @@ object ActionOperation {
     //collect
     //count
     //take
+    countBykey
     //saveAsTextFile
     foreach
   }
@@ -41,6 +42,13 @@ object ActionOperation {
     for(x<-arrs) {
       println(x)
     }
+  }
+  def countBykey(): Unit ={
+    val conf = new SparkConf().setMaster("local").setAppName("reduce")
+    val sc = new SparkContext(conf)
+      .parallelize(Array("aa","cc","bb","aa"),1)
+    val mp = sc.map(x=>(x,1))
+      .countByKey().foreach(x=>{println(x._1,x._2)})
   }
   def saveAsTextFile(): Unit = {
     val path = "file:///C:/Users/admin/Desktop/out/out1"
