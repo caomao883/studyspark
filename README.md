@@ -12,4 +12,7 @@ BroadcastVariable广播变量
 比Java默认序列化快，并且更小内存小10倍
 
 ##sequenceFile
-case
+case 
+##map+case
+https://blog.csdn.net/lyzx_in_csdn/article/details/82930300
+com.uestc.Transformation.map_case

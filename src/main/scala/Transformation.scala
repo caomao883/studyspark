@@ -1,3 +1,4 @@
+package com.uestc
 import java.io.{DataInput, DataOutput}
 
 import org.apache.hadoop.io.{NullWritable, WritableComparable}
@@ -12,7 +13,8 @@ object Transformation {
     //join
     //cogroup
     //flatMap
-    sequenceFile
+    //sequenceFile
+    map_case
 
   }
   def groupByKey(): Unit = {
@@ -150,6 +152,24 @@ name:CompactBuffer(80)
 
     studentRdd
       .foreach(x => println("count: " + x.id + "\t" + x.name))
+  }
+  def map_case(): Unit ={
+    val conf = new SparkConf().setMaster("local").setAppName("map+case")
+    val sc = new SparkContext(conf)
+    sc.parallelize(Array("11:22:33","44:dd","f")).map(line=>line.split(":"))
+      .map(
+        line=>if(line.length == 1) (line(0))
+        else if(line.length == 2) (line(0),line(1))
+        else (line(0),line(1),line(2))
+      )
+      .map{
+
+        case (name,age) =>("name:"+name,"age:"+age)
+        case (one) => ("one:"+one)
+        case _ => ("_name","_age","_")
+      }
+      .foreach(println)
+
   }
 }
 
