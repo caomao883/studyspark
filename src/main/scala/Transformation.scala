@@ -1,3 +1,7 @@
+import java.io.{DataInput, DataOutput}
+
+import org.apache.hadoop.io.{NullWritable, WritableComparable}
+import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.spark.{SparkConf, SparkContext}
 
 object Transformation {
@@ -7,7 +11,9 @@ object Transformation {
     //sortByKey
     //join
     //cogroup
-    flatMap
+    //flatMap
+    sequenceFile
+
   }
   def groupByKey(): Unit = {
     val conf = new SparkConf().setMaster("local").setAppName("groupByKey")
@@ -117,6 +123,72 @@ name:CompactBuffer(80)
     val sc = new SparkContext(conf)
     sc.parallelize(Array("11:22","22:33","33:44"),1)
       .flatMap(x=>x.split(":")).foreach(x=>println(x))
+  }
+  def sequenceFile(): Unit ={
+    val conf = new SparkConf().setMaster("local").setAppName("sequenceFile")
+    val sc = new SparkContext(conf)
+    sc.parallelize(Array("11:22","22:33","33:44"),1).map(x=>(x,1))
+    // 定义测试数据
+    val studentList = List(Student("01", "abc"), Student("02", "baby"), Student("03", "xiang"))
+
+    val path = "file:///C:/Users/admin/Desktop/out/out4"
+    // 序列化测试数据到RDD,并写入到bos
+    sc.parallelize(studentList)
+      .repartition(1)
+      // 以NullWritable 为key,构建kv结构.SequenceFile需要kv结构才能存储,NullWritable不占存储
+      .map(NullWritable.get() -> _)
+      // 压缩参数可选用
+      .saveAsSequenceFile(s"$path")
+
+    // 读取刚才写入的数据
+    val studentRdd = sc.sequenceFile(s"$path/part-*", classOf[NullWritable], classOf[Student])
+      .map {
+        // 读取数据,并且重新赋值对象
+        case (_, y) => Student(y.id, y.name)
+      }
+      .persist()
+
+    studentRdd
+      .foreach(x => println("count: " + x.id + "\t" + x.name))
+  }
+}
+
+case class Student(var id: String, var name: String) extends WritableComparable[Student] {
+  /**
+    * 重写无参构造函数,用于反序列化时的反射操作
+    */
+  def this() {
+    this("", "")
+  }
+
+  /**
+    * 继承Comparable接口需要实现的方法,用于比较两个对象的大小
+    */
+  override def compareTo(o: Student): Int = {
+    var cmp = id compareTo o.id
+    if (cmp == 0) {
+      cmp = name compareTo o.name
+    }
+    cmp
+  }
+
+  /**
+    * 继承Writable接口需要实现的方法-反序列化读取结果,并且赋值到对象字段
+    * 注意要和write的顺序一致
+    */
+  override def readFields(in: DataInput): Unit = {
+    name = in.readUTF()
+    id = in.readUTF()
+    println("count: " + "\t id = " + id + "\t name = " + name)
+  }
+
+  /**
+    * 继承Writable接口需要实现的方法-序列化写操作,将对象字段值写入序列化
+    * 注意要和readFields的顺序一致
+    */
+  override def write(out: DataOutput): Unit = {
+    out.writeUTF(id)
+    out.writeUTF(name)
   }
 
 }
